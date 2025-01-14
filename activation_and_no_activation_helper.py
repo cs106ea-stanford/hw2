@@ -124,12 +124,54 @@ class DynamicNetwork(nn.Module):
         return self.model(x)
 
 def create_random_networks(num_layers, num_nodes_per_layer, activation_func=nn.Tanh):
-    global net_with_activation, net_without_activation
-    
-    net_with_activation = DynamicNetwork(num_nodes_per_layer, num_layers, activation_func)
-    net_without_activation = DynamicNetwork(num_nodes_per_layer, num_layers, None)
+    return (DynamicNetwork(num_nodes_per_layer, num_layers, activation_func),
+                DynamicNetwork(num_nodes_per_layer, num_layers, None))
 
-# UI FOR NOTEBOOK
+# BASIC PRESET ARCHITECTURE VERSION
+
+basic_go_button = Button(
+    description = "Randomize Parameters and Graph",
+    layout = Layout(width="300px"),
+    button_style = 'info'
+)
+
+def create_basic_networks_and_graph(_):
+    global basic_activation, basic_no_activation
+    basic_activation, basic_no_activation = create_random_networks(
+        10,
+        10,
+        nn.Tanh
+    )
+
+    graph_networks(basic_graph_output, basic_activation, basic_no_activation)
+
+basic_go_button.on_click(create_basic_networks_and_graph)
+
+basic_graph_output = Output()
+
+def display_basic_ui():
+    display(html_style, 
+            VBox([
+                basic_go_button,
+                basic_graph_output
+            ]))
+    create_basic_networks_and_graph(None)
+
+# PRINT BASIC ARCHITECTURES
+
+basic_print_output = Output()    
+
+def display_print_basic_architectures():
+    display(basic_print_output)
+
+    with basic_print_output:
+        clear_output(wait=True)
+        display(HTML("<h2>Network with Activation Functions</h2>"))
+        print(basic_activation)
+        display(HTML("<h2>Network <u>without</u> Activation Functions</h2>"))
+        print(basic_no_activation)
+
+# UI FOR USER-DEFINED NETWORKS
 
 ui_activation_label = HTML(
     "<b>Activation Function</b>:",
@@ -157,7 +199,7 @@ ui_nodes_per_layer_label = HTML(
 
 ui_choose_nodes_per_layer_dropdown = Dropdown(
     options = [1, 2, 5, 10],
-    value = 10,
+    value = 1,
     layout = Layout(width="45px")
 )
 
@@ -170,7 +212,7 @@ ui_layers_label = HTML(
 
 ui_choose_layers_dropdown = Dropdown(
     options = [1, 2, 5, 10],
-    value = 10,
+    value = 1,
     layout = Layout(width="45px")
 )
 
@@ -183,19 +225,20 @@ ui_go_button = Button(
 )
 
 def create_random_networks_and_graph(_):
-    create_random_networks(
+    global net_with_activation, net_without_activation
+    net_with_activation, net_without_activation = create_random_networks(
         ui_choose_layers_dropdown.value,
         ui_choose_nodes_per_layer_dropdown.value,
         activation_dict[ui_choose_activation_dropdown.value]
     )
 
-    graph_networks(ui_graph_output)
+    graph_networks(ui_graph_output, net_with_activation, net_without_activation)
 
 ui_go_button.on_click(create_random_networks_and_graph)
 
 ui_graph_output = Output()
 
-def displayUI():
+def display_ui():
     display(html_style, 
             VBox([
                 ui_activation_group, 
@@ -208,7 +251,7 @@ def displayUI():
 
 # ACTUAL GRAPH OF NETWORK OUTPUT
 
-def graph_networks(output):
+def graph_networks(output, network_activation, network_no_activation):
     with output:
         clear_output(wait=True)
         
@@ -217,8 +260,8 @@ def graph_networks(output):
         x_tensor = torch.tensor(x_values, dtype=torch.float32)
         
         # Get outputs from both networks
-        y_with_activation = net_with_activation(x_tensor).detach().numpy()
-        y_without_activation = net_without_activation(x_tensor).detach().numpy()
+        y_with_activation = network_activation(x_tensor).detach().numpy()
+        y_without_activation = network_no_activation(x_tensor).detach().numpy()
         
         # Plot the results
         plt.figure(figsize=(12, 6))
@@ -252,7 +295,7 @@ print_btn_network = Button(
 
 print_output = Output()
 
-def printNetworkArchitectures(_):
+def print_network_architectures(_):
     with print_output:
         clear_output(wait=True)
         display(HTML("<h2>Network with Activation Functions</h2>"))
@@ -260,10 +303,10 @@ def printNetworkArchitectures(_):
         display(HTML("<h2>Network <u>without</u> Activation Functions</h2>"))
         print(net_without_activation)
         
-print_btn_network.on_click(printNetworkArchitectures)
+print_btn_network.on_click(print_network_architectures)
 
-def displayNetworkPrintouts():
+def display_network_printouts():
     display(html_style, VBox([print_btn_network, print_output]))
-    printNetworkArchitectures(None)
+    print_network_architectures(None)
 
     
