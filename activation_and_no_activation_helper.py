@@ -37,56 +37,6 @@ if torch.cuda.is_available():
 else:
     device = "cpu"
 
-### SETUP CSS STYLES
-#   These will only be used if you if you explicitly include
-#   them in a given "display()" call
-
-html_style = HTML(
-    value="""
-<style>
-.control-major-label {
-    font-size: 1.2em;
-    font-weight: bold;
-}
-.control-label {
-    font-size: 1em;
-    font-weight: bold;
-}
-.control-minor-label {
-    font-size: 0.9em;
-}
-.widget-checkbox {
-    width: auto !important;  /* Adjust this if necessary */
-    /*border: 1px solid blue;*/ /* To see the actual space taken by the checkbox container */
-}
-.widget-checkbox > label {
-    margin: 0 !important;
-    padding: 0 !important;
-    width: auto !important;
-    /*border: 1px solid red;*/ /* To see the space taken by the label */
-}
-.widget-checkbox input[type="checkbox"] {
-    margin: 0 !important;
-}
-.widget-inline-hbox .widget-label {
-    flex: 0 0 auto !important;
-}
-.widget-inline-hbox {
-    align-items: center; /* Align items vertically in the center */
-    min-width: 0; /* Helps prevent flex containers from growing too large */
-}
-.code {
-    font-family: 'Courier New', Courier, monospace;
-    font-weight: bold;
-    line-height: 0.5;
-    margin: 0;
-    padding: 0;
-}
-</style>
-
-    """
-)
-
 # DEFINE NETWORKS
 
 class DynamicNetwork(nn.Module):
@@ -150,7 +100,7 @@ basic_go_button.on_click(create_basic_networks_and_graph)
 basic_graph_output = Output()
 
 def display_basic_ui():
-    display(html_style, 
+    display( 
             VBox([
                 basic_go_button,
                 basic_graph_output
@@ -306,7 +256,7 @@ def print_network_architectures(_):
 print_btn_network.on_click(print_network_architectures)
 
 def display_network_printouts():
-    display(html_style, VBox([print_btn_network, print_output]))
+    display(VBox([print_btn_network, print_output]))
     print_network_architectures(None)
 
     
