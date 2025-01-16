@@ -239,8 +239,8 @@ ui_go_button.on_click(create_random_networks_and_graph)
 ui_graph_output = Output()
 
 def display_ui():
-    display(html_style, 
-            VBox([
+    display(
+        VBox([
                 ui_activation_group, 
                 ui_choose_nodes_per_layer_group,
                 ui_choose_layers_group,
